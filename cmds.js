@@ -181,66 +181,68 @@ exports.playCmd = (socket, rl) => {
 		var Questions = 0;
 
 	models.quiz.findAll()
-		.each(quiz=>{
-			Questions++;
-			toBeResolved.length = Questions;
-			toBeResolved.push(quiz.id);
-			})
-	 .then(()=>{
-		if(toBeResolved.length === 0 ){
-			log(socket,'No quedan más preguntas','red');
-		} else{
-			playOne();
-		}
-	})
-	.catch(error=>{
-		errorlog(socket,error.message);
-	})
-	.then(()=>{
-		rl.prompt();
-	});
+		.then(quizzes=>{
+			quizzes.forEach((quiz,id)=>{
+				Questions++;
+				toBeResolved.length = Questions;
+				toBeResolved.push(quiz.id);
+			})	
+		})
+	 	.then(()=>{
+			if(toBeResolved.length === 0 ){
+				log(socket,'No quedan más preguntas','red');
+			} else{
+				playOne();
+			}
+		});
+//	.catch(error=>{
+//		errorlog(socket,error.message);
+//	})
+//	.then(()=>{
+//		rl.prompt();
+//	});
 
 		const playOne =()=> {
-			var restantes =Questions - puntos;
+//			var restantes =Questions - puntos;
+
 			var id = Math.floor(Math.random()*(Questions-puntos));
 			validateId(id);
+			let quiz = toBeResolved[id];
+
 			models.quiz.findById(toBeResolved[id])
 			.then(quiz=> {
-				log(socket,`Pregunta: ${quiz.question}`);
+				
 				return makeQuestion(rl, '¿Respuesta?')
 					.then(a=> {
 						if(a.toLowerCase().trim()=== quiz.answer.toLowerCase()){
 							puntos++;
 							log(socket,`CORRECTA, lleva ${puntos} puntos`,'green');
-								if(puntos < Questions){
-								toBeResolved.splice(id,1);
-								models.quiz.findById(id)
-								.then(()=>{
-									rl.prompt();
-								})
-								.then(()=>{
-									playOne();
-								});
-								} else{
-									log(socket,'HAS GANADO');
-								}
+								
+							toBeResolved.splice(id,1);
+							playOne();
+
+							if(puntos===Questions){
+								log(socket,`Has acertado todas las preguntas`);
+								rl.prompt();
+							}
 						}else{
 							log(socket,'INCORRECTA');
-							log(socket,`Has acertado ${puntos} preguntas`);
+							rl.prompt();
+							
 						}
 					})
-			.catch(error =>{
-				errorlog(socket,error.message);
-			});
-		})
+					.catch(error =>{
+						errorlog(socket,error.message);
+						rl.prompt();
+					});
+			})
 			.catch(error=>{
 					errorlog(socket,error.message);
 			})
-
 			.then(()=>{
 				rl.prompt();
 			});
-		};	
+		}
 };
 
 exports.deleteCmd = (socket, rl, id)  => {

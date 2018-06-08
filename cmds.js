@@ -36,7 +36,7 @@ exports.addCmd = (socket, rl) => {
 		})
 		.catch(Sequelize.ValidationError, error =>{
 			errorlog(socket,'El quiz es erroneo:');
-			error.errors.forEach(({message})=> errorlog(message));
+			error.errors.forEach(({message})=> errorlog(socket, message));
 		})
 		.catch(error=>{
 			errorlog(socket,error.message);
@@ -94,7 +94,7 @@ exports.listCmd = (socket, rl) => {
 };
 
 
-const validateId = id => {
+const validateId = (id) => {
 	return new Sequelize.Promise((resolve, reject)=>{
 		if(typeof id === "undefined"){
 			reject(new Error(`Falta el parámetro <id>.`));
@@ -141,7 +141,7 @@ exports.testCmd = (socket, rl,id)  => {
 		validateId(id)
 		.then(id=> models.quiz.findById(id))
 		.then(quiz=>{
-			log(cocket,`Pregunta : ${quiz.question}`)
+			log(socket,`Pregunta : ${quiz.question}`)
 		return makeQuestion(rl, '¿Respuesta:')
 		.then( a=> {
 					if(a.toLowerCase().trim() === quiz.answer.toLowerCase()){
@@ -242,8 +242,8 @@ exports.deleteCmd = (socket, rl, id)  => {
 };
 exports.creditsCmd = (socket,rl) => {
 		log(socket,'Autores:');
-		log(socket,'Natalia Garcia');
-		log(socket,'Ignacio Arregui');
+		log(socket,'	1) NATALIA GARCIA');
+		log(socket,'	2) IGNACIO ARREGUI');
 		rl.prompt();
 
 };

@@ -1,7 +1,7 @@
 const {models} = require('./model');
 const Sequelize = require('sequelize');
 const {log, biglog, errorlog, colorize} = require('./out');
-const readline = require('readline');
+//const readline = require('readline');
 
 
 exports.helpCmd = (socket,rl) => {
@@ -242,8 +242,8 @@ exports.deleteCmd = (socket, rl, id)  => {
 };
 exports.creditsCmd = (socket,rl) => {
 		log(socket,'Autores:');
-		log(socket,'	1) NATALIA GARCIA');
-		log(socket,'	2) IGNACIO ARREGUI');
+		log(socket, 'NATALIA');
+		//log(socket, 'IGNACIO');
 		rl.prompt();
 
 };

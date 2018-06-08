@@ -152,15 +152,18 @@ exports.testCmd = (socket, rl,id)  => {
 		validateId(id)
 		.then(id=> models.quiz.findById(id))
 		.then(quiz=>{
-			log(socket,`Pregunta : ${quiz.question}`)
-		return makeQuestion(rl, '¿Respuesta:')
+			if(!quiz){
+				throw new Error('No existe quiz con id ${id}');
+			}
+	
+		return makeQuestion(socket, rl, '¿Respuesta:')
 		.then( a=> {
 					if(a.toLowerCase().trim() === quiz.answer.toLowerCase()){
 							log(socket, 'Respuesta CORRECTA');
 					} else {
 							log(socket, 'Respuesta INCORRECTA');
 					}
-				})
+				});
 		})
 		.catch(error=>{
 				errorlog(socket, error.message);
@@ -184,7 +187,7 @@ exports.playCmd = (socket, rl) => {
 			toBeResolved.push(quiz.id);
 			})
 	 .then(()=>{
-		if(Questions == 0 ){
+		if(toBeResolved.length === 0 ){
 			log(socket,'No quedan más preguntas','red');
 		} else{
 			playOne();

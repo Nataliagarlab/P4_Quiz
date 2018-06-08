@@ -6,9 +6,8 @@ const cmds = require('./cmds');
 
 const net = require("net");
 
-net.createServer(socket=>{
+net.createServer(socket => {
 	console.log("Se ha conectado un cliente"+ socket.remoteAddres);
-})
 
 biglog(socket,'CORE Quiz', 'green');
 
@@ -26,8 +25,8 @@ const rl = readline.createInterface({
 });
 
 socket
-.on("end", ()=> {rl.close();})
-.on("error", ()=> {rl.close();});
+.on("end", ()=> {rl.close()})
+.on("error", ()=> {rl.close()});
 
 rl.prompt();
 
@@ -84,13 +83,11 @@ rl.on(
 				rl.prompt();
 				break;
 			}
-	}
-);
-
-.on(
-	'close', ()=> {
-		log(socket,`adios`);
 	})
+.on('close', ()=> {
+	log(socket,`adios`);
+	});
+})
 .listen(3030);
 
 

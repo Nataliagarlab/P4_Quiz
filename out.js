@@ -17,7 +17,7 @@ const log = (socket, msg, color) => {
 };
 
 const biglog = (socket, msg, color) => {
-	log(socket, figlet.textSync(msg, {horizontalLayout : 'full'}), color);
+	socket.log(socket, figlet.textSync(msg, {horizontalLayout : 'full'}), color);
 };
 
 const errorlog = (socket, emsg) => {

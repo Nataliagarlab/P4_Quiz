@@ -21,7 +21,7 @@ exports.helpCmd = (socket,rl) => {
 
 exports.addCmd = (socket, rl) => {
 
-		makeQuestion(rl, 'Introduzca una pregunta')
+		makeQuestion(socket, rl, 'Introduzca una pregunta')
 		.then(q => {
 			return makeQuestion(rl, 'Introduzca la respuesta')
 			.then(a =>{
@@ -48,30 +48,41 @@ exports.addCmd = (socket, rl) => {
 
 
 exports.editCmd =(socket,rl,id) => {
-		if(typeof id === "undefined"){
-			errorlog(socket,'Falta el parametro id');
-			rl.prompt();
-		} else {
-			try{
-
+		validateId(id)
+		.then(id=> models.quiz.findById(id))
+		.then(quiz => {
+			if(!quiz){
+				throw new Error(`No existe quiz con ${id} de id`);
+				}
 				process.stdout.isTTY && setTimeout( () => {rl.write(id.question)},0);
-				
-				rl.question(colorize('Introduzca una pregunta:', 'red'), question => {
-					
+				return makeQuestion(socket, rl, '¿Respuesta?')
+				.then(q=>{
 					process.stdout.isTTY && setTimeout( () => {rl.write(id.answer)},0);
-					rl.question(colorize('Introduzca la respuesta', 'red'), answer => {
-
-						model.update(id, question, answer);
-						log(socket,`[${colorize('Se ha añadido','magenta')}]: ${question} ${colorize('=>','magenta')}${answer}`);
-						rl.prompt();
-					})
-				})
-			}catch(error){
-				errorlog(socket,error.message);
-				rl.prompt();
-			}
-		}
-		rl.prompt();
+					return makeQuestion(socket, rl, `¿Respuesta?`)
+					.then(a=> {
+						quiz.question = q;
+						quiz.answer = a;
+						return quiz;
+					});
+				});
+		})
+		.then(quiz => {
+			return quiz.save();
+		})
+		.then(quiz =>{
+			log(socket, `Se ha cambiado ${colorize(quiz.id,'magenta')}, por: ${quiz.question}$(colorize'=>', 'magenta')}${quiz.answer}`);
+		})
+		.catch(Sequelize.ValidationError, error =>{
+			errorlog(socket, 'Error en quiz');
+			error.errors.forEach(({message})=> errorlog(socket, message));
+		})
+		.catch(error=>{
+			errorlog(socket,error.message);
+		})
+		.then(()=>{
+			rl.prompt();
+		});
+				
 };
 
 exports.quitCmd = (socket,rl) => {
@@ -128,7 +139,7 @@ exports.showCmd = (socket, rl,id)  => {
 	};
 
 
-const makeQuestion = (rl, text)=> {
+const makeQuestion = (socket, rl, text)=> {
 	return new Sequelize.Promise((resolve, reject)=> {
 		rl.question(colorize(text,  'red'), answer =>{
 			resolve(answer.trim());
@@ -241,9 +252,8 @@ exports.deleteCmd = (socket, rl, id)  => {
 
 };
 exports.creditsCmd = (socket,rl) => {
-		log(socket,'Autores:');
+		log(socket,'Autor de la práctica');
 		log(socket, 'NATALIA');
 		//log(socket, 'IGNACIO');
 		rl.prompt();
-
 };

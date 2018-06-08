@@ -1,8 +1,8 @@
 
 const figlet = require('figlet');
 const chalk = require('chalk');
-const readline = require('readline');
-const Sequelize = require('sequelize');
+//const readline = require('readline');
+//const Sequelize = require('sequelize');
 
 
 const colorize = (msg, color) => {
@@ -13,15 +13,15 @@ const colorize = (msg, color) => {
 };
 
 const log = (socket, msg, color) => {
-	socket.write(colorize(msg, color));
+	socket.write(colorize(msg, color)+ "\n");
 };
 
 const biglog = (socket, msg, color) => {
-	socket.log(socket, figlet.textSync(msg, {horizontalLayout : 'full'}), color);
+	log(socket, figlet.textSync(msg, {horizontalLayout : 'full'}), color);
 };
 
 const errorlog = (socket, emsg) => {
-	socket.log(`${colorize('Error','red')} : ${colorize(emsg, "red")}` );
+	socket.log(`${colorize('Error','red')} : ${colorize(emsg, "red")}+"\n"` );
 };
 
 

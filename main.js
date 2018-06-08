@@ -1,6 +1,6 @@
 
 const readline = require('readline');
-const model = require('./model');
+//const model = require('./model');
 const {log, biglog, errorlog, colorize} = require('./out');
 const cmds = require('./cmds');
 
@@ -9,7 +9,7 @@ const net = require("net");
 net.createServer(socket => {
 	console.log("Se ha conectado un cliente"+ socket.remoteAddres);
 
-biglog(socket,'CORE Quiz', 'green');
+	biglog(socket,'CORE Quiz', 'green');
 
 const rl = readline.createInterface({
 	input: socket,
@@ -30,7 +30,8 @@ socket
 
 rl.prompt();
 
-rl.on(
+rl.
+on(
 	'line', (line)=>{
 
 		let args = line.split(" ");
